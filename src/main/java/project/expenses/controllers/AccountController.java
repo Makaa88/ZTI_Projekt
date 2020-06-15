@@ -43,7 +43,7 @@ public class AccountController {
         Optional<Person> loginPerson = personRepository.findByUsernameAndPassword(person.getUsername(), person.getPassword());
         if(loginPerson.isPresent()) {
             System.out.println("Login successfull");
-            session.setAttribute("person", person);
+            session.setAttribute("person", loginPerson.get());
             logInDataModel.setPerson(loginPerson.get());
             logInDataModel.setLoginStatus(true);
 

@@ -2,12 +2,21 @@ import React, {Component} from 'react';
 import axios from "axios";
 import { Link, Redirect } from 'react-router-dom';
 
+import EditExpense from './EditExpense';
+
 class Expense extends Component
 {
     state =
         {
             deleteRender: false,
+            edit: false,
         };
+
+    makeEditable()
+    {
+        this.setState({edit: true});
+    }
+
 
     deleteExpense(id)
     {
@@ -43,6 +52,13 @@ class Expense extends Component
 
         return(
             <div className="bg-light px-4 py-3 d-flex">
+
+                <div>
+                    {
+                       this.state.edit && <EditExpense id={this.props.expense.id} edit={this.state.edit}/>
+                    }
+                    <button type="button" onClick={this.makeEditable.bind(this)}> Edytuj </button>
+                </div>
                 <p className="m-0">{this.props.expense.goal}</p>
                 <p className="m-0">{this.props.expense.date}</p>
                 <p className="m-0">{Number(this.props.expense.amount).toFixed(2)}</p>
