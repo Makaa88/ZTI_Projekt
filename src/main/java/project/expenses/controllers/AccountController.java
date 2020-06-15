@@ -21,14 +21,6 @@ public class AccountController {
     @Autowired
     private PersonRepository personRepository;
 
-    @GetMapping("/createAccount")
-    public Person createAccount(Model model)
-    {
-        Person person = new Person();
-        model.addAttribute("personToAdd", person);
-        return person;
-    }
-
     @PostMapping("/createAccount")
     public void saveAccount(@RequestBody PersonDto person, Model model)
     {
@@ -40,14 +32,6 @@ public class AccountController {
         personToSave.setPassword(person.getPassword());
 
         personRepository.save(personToSave);
-    }
-
-    @GetMapping("/loginPage")
-    public String showLoginPage(Model model)
-    {
-        Person person = new Person();
-        model.addAttribute("personToAdd", person);
-        return "loginPage";
     }
 
     @PostMapping("/login")
@@ -68,6 +52,14 @@ public class AccountController {
 
         return logInDataModel;
     }
+
+    @PostMapping("/logout")
+    public LogInDataModel logOut(HttpSession session)
+    {
+        session.removeAttribute("person");
+        return new LogInDataModel(true, null);
+    }
+
 
 
 }

@@ -6,12 +6,12 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import project.expenses.models.Calendar;
-import project.expenses.models.Expenses;
-import project.expenses.models.Person;
+import project.expenses.models.*;
 import project.expenses.models.ResponseStatus;
 import project.expenses.models.dto.ExpensesDto;
+import project.expenses.models.dto.IncomeDto;
 import project.expenses.repositiories.ExpensesRepository;
+import project.expenses.repositiories.IncomeRepository;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
@@ -20,48 +20,48 @@ import java.util.Optional;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/expenses")
-public class ExpensesController {
+@RequestMapping("/income")
+public class IncomeController {
 
     @Autowired
-    private ExpensesRepository expensesRepository;
+    private IncomeRepository incomeRepository;
 
-    @PostMapping("/addExpense")
-    public ExpensesDto addExpense(@Valid ExpensesDto expensesDto ,Model model, HttpSession session)
+    @PostMapping("/addIncome")
+    public IncomeDto addExpense(@Valid IncomeDto incomeDto , Model model, HttpSession session)
     {
         Person person = (Person)session.getAttribute("person");
 
-        Expenses expenses = new Expenses();
-        expenses.setPerson(person);
-        expenses.setDate(expensesDto.getDate());
-        expenses.setAmmount(expensesDto.getAmount());
-        expenses.setGoal(expensesDto.getGoal());
+        Income income = new Income();
+        income.setPerson(person);
+        income.setDate(incomeDto.getDate());
+        income.setAmmount(incomeDto.getAmount());
+        income.setGoal(incomeDto.getGoal());
 
         ResponseStatus responseStatus = new ResponseStatus();
         responseStatus.setSuccessResponse(true);
         try
         {
-            expensesRepository.save(expenses);
+            incomeRepository.save(income);
         }
         catch(DataIntegrityViolationException e)
         {
             responseStatus.setSuccessResponse(false);
             responseStatus.setError("Error during saving expense");
-            expensesDto.setResponseStatus(responseStatus);
-            return expensesDto;
+            incomeDto.setResponseStatus(responseStatus);
+            return incomeDto;
         }
 
-        expensesDto.setId(person.getId());
-        expensesDto.setResponseStatus(responseStatus);
+        incomeDto.setId(person.getId());
+        incomeDto.setResponseStatus(responseStatus);
 
-        return expensesDto;
+        return incomeDto;
     }
 
 
     @PutMapping("/edit/{id}")
-    public ExpensesDto editExpense(@RequestBody ExpensesDto expensesDto, @PathVariable long id, HttpSession session)
+    public IncomeDto editExpense(@RequestBody IncomeDto incomeDto, @PathVariable long id, HttpSession session)
     {
-        Optional<Expenses> optionalExpenses = expensesRepository.findById(id);
+        Optional<Income> optionalExpenses = incomeRepository.findById(id);
         ResponseStatus responseStatus = new ResponseStatus();
 
         responseStatus.setSuccessResponse(false);
@@ -69,15 +69,15 @@ public class ExpensesController {
 
         if(optionalExpenses.isPresent())
         {
-            Expenses expenses = optionalExpenses.get();
-            expenses.setGoal(expensesDto.getGoal());
-            expenses.setAmmount(expensesDto.getAmount());
-            expenses.setDate(expensesDto.getDate());
-            expenses.setPerson((Person)session.getAttribute("person"));
+            Income income = optionalExpenses.get();
+            income.setGoal(incomeDto.getGoal());
+            income.setAmmount(incomeDto.getAmount());
+            income.setDate(incomeDto.getDate());
+            income.setPerson((Person)session.getAttribute("person"));
 
             try
             {
-                expensesRepository.save(expenses);
+                incomeRepository.save(income);
                 responseStatus.setSuccessResponse(true);
                 responseStatus.setError("");
             }
@@ -87,21 +87,21 @@ public class ExpensesController {
             }
         }
 
-        expensesDto.setResponseStatus(responseStatus);
-        return expensesDto;
+        incomeDto.setResponseStatus(responseStatus);
+        return incomeDto;
     }
 
     @DeleteMapping("/delete/{id}")
 
     public void deleteExpense(@PathVariable long id)
     {
-        expensesRepository.deleteById(id);
+        incomeRepository.deleteById(id);
     }
 
-    @GetMapping("/getExpenses")
-    public Iterable<Expenses> getExpenses()
+    @GetMapping("/getIncome")
+    public Iterable<Income> getExpenses()
     {
-        return expensesRepository.findAll();
+        return incomeRepository.findAll();
     }
 
 }
