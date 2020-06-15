@@ -15,6 +15,7 @@ import project.expenses.repositiories.ExpensesRepository;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,7 +28,7 @@ public class ExpensesController {
     private ExpensesRepository expensesRepository;
 
     @PostMapping("/addExpense")
-    public ExpensesDto addExpense(@Valid ExpensesDto expensesDto ,Model model, HttpSession session)
+    public ExpensesDto addExpense(@RequestBody ExpensesDto expensesDto ,Model model, HttpSession session)
     {
         Person person = (Person)session.getAttribute("person");
 
@@ -51,7 +52,7 @@ public class ExpensesController {
             return expensesDto;
         }
 
-        expensesDto.setId(person.getId());
+        //expensesDto.setId(person.getId());
         expensesDto.setResponseStatus(responseStatus);
 
         return expensesDto;
@@ -92,16 +93,31 @@ public class ExpensesController {
     }
 
     @DeleteMapping("/delete/{id}")
-
-    public void deleteExpense(@PathVariable long id)
+    public ResponseStatus deleteExpense(@PathVariable long id)
     {
         expensesRepository.deleteById(id);
+        ResponseStatus responseStatus = new ResponseStatus();
+        responseStatus.setSuccessResponse(true);
+        return responseStatus;
     }
 
     @GetMapping("/getExpenses")
-    public Iterable<Expenses> getExpenses()
+    public Iterable<ExpensesDto> getExpenses()
     {
-        return expensesRepository.findAll();
+         List<Expenses> expensesList = expensesRepository.findAll();
+         List<ExpensesDto> expensesDtoList = new ArrayList<>();
+
+         for(Expenses expenses : expensesList)
+         {
+             ExpensesDto expensesDto = new ExpensesDto();
+             expensesDto.setId(expenses.getId());
+             expensesDto.setAmount(expenses.getAmmount());
+             expensesDto.setDate(expenses.getDate());
+             expensesDto.setGoal(expenses.getGoal());
+             expensesDtoList.add(expensesDto);
+         }
+
+         return expensesDtoList;
     }
 
 }

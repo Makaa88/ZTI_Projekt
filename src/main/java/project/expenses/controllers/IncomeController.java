@@ -15,6 +15,7 @@ import project.expenses.repositiories.IncomeRepository;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,7 +28,7 @@ public class IncomeController {
     private IncomeRepository incomeRepository;
 
     @PostMapping("/addIncome")
-    public IncomeDto addExpense(@Valid IncomeDto incomeDto , Model model, HttpSession session)
+    public IncomeDto addExpense(@RequestBody IncomeDto incomeDto , Model model, HttpSession session)
     {
         Person person = (Person)session.getAttribute("person");
 
@@ -92,16 +93,31 @@ public class IncomeController {
     }
 
     @DeleteMapping("/delete/{id}")
-
-    public void deleteExpense(@PathVariable long id)
+    public ResponseStatus deleteExpense(@PathVariable long id)
     {
         incomeRepository.deleteById(id);
+        ResponseStatus responseStatus = new ResponseStatus();
+        responseStatus.setSuccessResponse(true);
+        return responseStatus;
     }
 
     @GetMapping("/getIncome")
-    public Iterable<Income> getExpenses()
+    public Iterable<IncomeDto> getExpenses()
     {
-        return incomeRepository.findAll();
+        List<Income> incomeList = incomeRepository.findAll();
+        List<IncomeDto> incomeDtoList = new ArrayList<>();
+
+        for(Income income : incomeList)
+        {
+            IncomeDto incomeDto = new IncomeDto();
+            incomeDto.setId(income.getId());
+            incomeDto.setAmount(income.getAmmount());
+            incomeDto.setDate(income.getDate());
+            incomeDto.setGoal(income.getGoal());
+            incomeDtoList.add(incomeDto);
+        }
+
+        return incomeDtoList;
     }
 
 }

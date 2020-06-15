@@ -1,9 +1,8 @@
 import React, {Component} from 'react';
-import axios from 'axios'
+import axios from "axios";
 import { Link, Redirect } from 'react-router-dom';
-import '../index.css'
 
-class LoginComponent extends Component
+class AddExpense extends Component
 {
     constructor(props)
     {
@@ -12,9 +11,9 @@ class LoginComponent extends Component
         this.state=
             {
                 redirect: false,
-                username: "",
-                password: "",
-                loginErrors: "",
+                date: "",
+                ammount: 0.0,
+                goal: "",
             };
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleChange = this.handleChange.bind(this);
@@ -29,30 +28,27 @@ class LoginComponent extends Component
 
     handleSubmit(event)
     {
-        const {username, password} = this.state;
+        const {date, ammount, goal} = this.state;
         console.log("GHandle submit");
 
         axios.post(
-            "/auth/login",
+            "/expenses/addExpense",
             {
-                username: username, password: password
+                date: date, amount: ammount, goal: goal
             }
         ).then(response => {
-            if(response.data.loginStatus)
+            if(response.data.successResponse)
             {
-                console.log("Loged");
-                sessionStorage.setItem("session", "valid");
+                console.log("Added new expense");
                 this.setState({redirect: true});
 
             }
-            else console.log("Not loged");
+            else console.log("Can add expense");
         }).catch(error => {
-            console.log("login eroor", error);
+            console.log("Can add expense");
         });
 
-        event.preventDefault();
     }
-
 
     render() {
         const {redirect} = this.state;
@@ -66,32 +62,30 @@ class LoginComponent extends Component
                 <div className="login-form-1">
                     <form onSubmit={this.handleSubmit}>
                         <div className="form-group">
-                        Login:
-                        <input className="form-control center-block" type="text" name="username" onChange={this.handleChange}
-                               value={this.state.username} required/>
+                            Data:
+                            <input className="form-control center-block" type="date" name="date" onChange={this.handleChange}
+                                   value={this.state.date} required/>
                         </div>
                         <div className="form-group">
-                        Hasło:
-                        <input className="form-control center-block" type="password" name="password" onChange={this.handleChange}
-                               value={this.state.password} required/>
+                            ammount:
+                            <input className="form-control center-block" type="number" name="ammount" onChange={this.handleChange}
+                                   value={this.state.ammount} required/>
+                        </div>
+                        <div className="form-group">
+                            Na co wydatek:
+                            <input className="form-control center-block" type="text" name="goal" onChange={this.handleChange}
+                                   value={this.state.goal} required/>
                         </div>
                         <div className="form-group row justify-content-center align-items-center">
-                            <button className="btn btn-primary btn-lg center-block" type="submit">Zaloguj</button>
+                            <button className="btn btn-primary btn-lg center-block" type="submit">Dodaj</button>
                         </div>
                     </form>
 
                     <p>{this.state.loginErrors}</p>
-                    <div className="form-group row justify-content-center align-items-center">
-
-                            Utwórz konto <Link to='/register'>Zarejestruj się</Link>
-
-                    </div>
                 </div>
             </div>
         );
     }
-
-
 }
 
-export default LoginComponent;
+export default AddExpense;

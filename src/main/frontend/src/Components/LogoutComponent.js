@@ -33,7 +33,6 @@ class LogoutComponent extends Component
             console.log("logout eroor", error);
         });
 
-        event.preventDefault();
     }
 
     render() {
