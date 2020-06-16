@@ -41,7 +41,7 @@ class AddExpense extends Component
             {
                 console.log("Added new expense");
                 this.setState({redirect: true});
-
+                this.props.add = false;
             }
             else console.log("Can add expense");
         }).catch(error => {

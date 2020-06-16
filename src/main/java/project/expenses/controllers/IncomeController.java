@@ -28,10 +28,8 @@ public class IncomeController {
     private IncomeRepository incomeRepository;
 
     @PostMapping("/addIncome")
-    public IncomeDto addExpense(@RequestBody IncomeDto incomeDto , Model model, HttpSession session)
+    public IncomeDto addExpense(@RequestBody IncomeDto incomeDto , Model model, @SessionAttribute("person") Person person)
     {
-        Person person = (Person)session.getAttribute("person");
-
         Income income = new Income();
         income.setPerson(person);
         income.setDate(incomeDto.getDate());
@@ -60,7 +58,7 @@ public class IncomeController {
 
 
     @PutMapping("/edit/{id}")
-    public IncomeDto editExpense(@RequestBody IncomeDto incomeDto, @PathVariable long id, HttpSession session)
+    public IncomeDto editExpense(@RequestBody IncomeDto incomeDto, @PathVariable long id, @SessionAttribute("person") Person person)
     {
         Optional<Income> optionalExpenses = incomeRepository.findById(id);
         ResponseStatus responseStatus = new ResponseStatus();
@@ -74,7 +72,7 @@ public class IncomeController {
             income.setGoal(incomeDto.getGoal());
             income.setAmmount(incomeDto.getAmount());
             income.setDate(incomeDto.getDate());
-            income.setPerson((Person)session.getAttribute("person"));
+            income.setPerson(person);
 
             try
             {

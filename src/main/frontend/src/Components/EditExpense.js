@@ -44,7 +44,6 @@ class EditExpense extends Component
                 console.log("Edited expense");
                 this.setState({redirect: true});
                 this.props.edit = false;
-
             }
             else console.log("Can add expense");
         }).catch(error => {
@@ -55,7 +54,7 @@ class EditExpense extends Component
 
     render() {
         return (
-            <Fragment>
+            <div>
                 <form className="d-flex ml-auto" onSubmit={this.handleSubmit}>
                     <div>
                     Data:
@@ -63,7 +62,7 @@ class EditExpense extends Component
                            value={this.state.date}/>
                      </div>
                     <div className="form-group">
-                        ammount:
+                        Kwota:
                         <input className="form-control center-block" type="number" name="ammount" onChange={this.handleChange}
                                value={this.state.ammount}/>
                     </div>
@@ -72,11 +71,11 @@ class EditExpense extends Component
                         <input className="form-control center-block" type="text" name="goal" onChange={this.handleChange}
                                value={this.state.goal}/>
                     </div>
-                    <div className="form-group row justify-content-center align-items-center">
+                    <div className="form-group row align-items-center">
                         <button className="btn btn-primary btn-lg center-block" type="submit">Dodaj</button>
                     </div>
                 </form>
-            </Fragment>
+            </div>
         )
     }
 

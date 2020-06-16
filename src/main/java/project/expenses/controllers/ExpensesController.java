@@ -28,10 +28,10 @@ public class ExpensesController {
     private ExpensesRepository expensesRepository;
 
     @PostMapping("/addExpense")
-    public ExpensesDto addExpense(@RequestBody ExpensesDto expensesDto ,Model model, HttpSession session)
+    public ExpensesDto addExpense(@RequestBody ExpensesDto expensesDto , @SessionAttribute("person") Person person)
     {
-        Person person = (Person)session.getAttribute("person");
-
+        if(person == null) System.out.println("PERSON IS NULL");
+        else System.out.println(person.getId());
         Expenses expenses = new Expenses();
         expenses.setPerson(person);
         expenses.setDate(expensesDto.getDate());
@@ -60,7 +60,7 @@ public class ExpensesController {
 
 
     @PutMapping("/edit/{id}")
-    public ExpensesDto editExpense(@RequestBody ExpensesDto expensesDto, @PathVariable long id, HttpSession session)
+    public ExpensesDto editExpense(@RequestBody ExpensesDto expensesDto, @PathVariable long id, @SessionAttribute("person") Person person)
     {
         Optional<Expenses> optionalExpenses = expensesRepository.findById(id);
         ResponseStatus responseStatus = new ResponseStatus();
@@ -74,7 +74,7 @@ public class ExpensesController {
             expenses.setGoal(expensesDto.getGoal());
             expenses.setAmmount(expensesDto.getAmount());
             expenses.setDate(expensesDto.getDate());
-            expenses.setPerson((Person)session.getAttribute("person"));
+            expenses.setPerson(person);
 
             try
             {
@@ -109,15 +109,39 @@ public class ExpensesController {
 
          for(Expenses expenses : expensesList)
          {
-             ExpensesDto expensesDto = new ExpensesDto();
-             expensesDto.setId(expenses.getId());
-             expensesDto.setAmount(expenses.getAmmount());
-             expensesDto.setDate(expenses.getDate());
-             expensesDto.setGoal(expenses.getGoal());
-             expensesDtoList.add(expensesDto);
+             expensesDtoList.add(fillExpensesDto(expenses));
          }
 
          return expensesDtoList;
     }
 
+    @PostMapping("/getSorted")
+    public Iterable<ExpensesDto> getSortedExpenses(@RequestBody ExpensesDto expensesDto, @SessionAttribute("person") Person person)
+    {
+        List<Expenses> expensesList = expensesRepository.findAllByPersonId(person.getId());
+        List<ExpensesDto> expensesDtoList = new ArrayList<>();
+
+
+        for(Expenses expenses : expensesList)
+        {
+            if(expenses.getDate().getMonth().equals(expensesDto.getDate().getMonth()) && expenses.getDate().getYear() == expensesDto.getDate().getYear())
+                expensesDtoList.add(fillExpensesDto(expenses));
+        }
+        return  expensesDtoList;
+    }
+
+    private ExpensesDto fillExpensesDto(Expenses expenses)
+    {
+        ExpensesDto expensesDto = new ExpensesDto();
+        expensesDto.setId(expenses.getId());
+        expensesDto.setAmount(expenses.getAmmount());
+        expensesDto.setDate(expenses.getDate());
+        expensesDto.setGoal(expenses.getGoal());
+        return expensesDto;
+    }
+
 }
+
+
+
+// {this.state.sorted && this.state.data.filter(e => new Date(e.date).getMonth()== new Date(constants.EXPENSES_DATE).getMonth() && new Date(e.date).getFullYear() == new Date(constants.EXPENSES_DATE).getFullYear()).map(element => <Expense expense={element}/> )}

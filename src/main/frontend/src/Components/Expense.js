@@ -14,8 +14,9 @@ class Expense extends Component
 
     makeEditable()
     {
-        this.setState({edit: true});
+        this.setState({edit: !this.state.edit});
     }
+
 
 
     deleteExpense(id)
@@ -49,20 +50,19 @@ class Expense extends Component
             return <Redirect to='/expenses'/>;
         }
 
-
         return(
             <div className="bg-light px-4 py-3 d-flex">
 
+                <p className="m-1">{this.props.expense.goal}</p>
+                <p className="m-1">{this.props.expense.date}</p>
+                <p className="m-1">{Number(this.props.expense.amount).toFixed(2)}</p>
+                <button type='button' className="btn btn-sm btn-danger ml-2" onClick={this.deleteExpense.bind(this, this.props.expense.id)}> Usuń </button>
+                <button type="button" onClick={this.makeEditable.bind(this)}> Edytuj </button>
                 <div>
                     {
-                       this.state.edit && <EditExpense id={this.props.expense.id} edit={this.state.edit}/>
+                        this.state.edit && <EditExpense id={this.props.expense.id} edit={this.state.edit}/>
                     }
-                    <button type="button" onClick={this.makeEditable.bind(this)}> Edytuj </button>
                 </div>
-                <p className="m-0">{this.props.expense.goal}</p>
-                <p className="m-0">{this.props.expense.date}</p>
-                <p className="m-0">{Number(this.props.expense.amount).toFixed(2)}</p>
-                <button type='button' className="btn btn-sm btn-danger ml-2" onClick={this.deleteExpense.bind(this, this.props.expense.id)}> Usuń </button>
             </div>
         );
     }
