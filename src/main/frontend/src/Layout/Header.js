@@ -14,6 +14,7 @@ class Header extends Component
                 <ul>
                     <li> <LogoutComponent/> </li>
                     <li className="nav-item"> <Link to="/expenses" className="nav-link"> Wydatki </Link> </li>
+                    <li className="nav-item"> <Link to="/income" className="nav-link"> Przychody </Link> </li>
                 </ul>
             </nav>
         )

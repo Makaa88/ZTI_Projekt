@@ -60,15 +60,15 @@ public class IncomeController {
     @PutMapping("/edit/{id}")
     public IncomeDto editExpense(@RequestBody IncomeDto incomeDto, @PathVariable long id, @SessionAttribute("person") Person person)
     {
-        Optional<Income> optionalExpenses = incomeRepository.findById(id);
+        Optional<Income> optionalIncome = incomeRepository.findById(id);
         ResponseStatus responseStatus = new ResponseStatus();
 
         responseStatus.setSuccessResponse(false);
         responseStatus.setError("Cannot find given expense");
 
-        if(optionalExpenses.isPresent())
+        if(optionalIncome.isPresent())
         {
-            Income income = optionalExpenses.get();
+            Income income = optionalIncome.get();
             income.setGoal(incomeDto.getGoal());
             income.setAmmount(incomeDto.getAmount());
             income.setDate(incomeDto.getDate());
@@ -116,6 +116,32 @@ public class IncomeController {
         }
 
         return incomeDtoList;
+    }
+
+
+    @PostMapping("/getSorted")
+    public Iterable<IncomeDto> getSortedExpenses(@RequestBody IncomeDto incomeDto, @SessionAttribute("person") Person person)
+    {
+        List<Income> incomeList = incomeRepository.findAllByPersonId(person.getId());
+        List<IncomeDto> incomeDtoList = new ArrayList<>();
+
+
+        for(Income income : incomeList)
+        {
+            if(income.getDate().getMonth().equals(incomeDto.getDate().getMonth()) && income.getDate().getYear() == incomeDto.getDate().getYear())
+                incomeDtoList.add(fillExpensesDto(income));
+        }
+        return  incomeDtoList;
+    }
+
+    private IncomeDto fillExpensesDto(Income income)
+    {
+        IncomeDto incomeDto = new IncomeDto();
+        incomeDto.setId(income.getId());
+        incomeDto.setAmount(income.getAmmount());
+        incomeDto.setDate(income.getDate());
+        incomeDto.setGoal(income.getGoal());
+        return incomeDto;
     }
 
 }

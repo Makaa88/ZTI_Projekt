@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import axios from "axios";
 import { Link, Redirect } from 'react-router-dom';
 
-class AddExpense extends Component
+class AddIncome extends Component
 {
     constructor(props)
     {
@@ -29,23 +29,20 @@ class AddExpense extends Component
     handleSubmit(event)
     {
         const {date, ammount, goal} = this.state;
-        console.log("GHandle submit");
 
         axios.post(
-            "/expenses/addExpense",
+            "/income/addIncome",
             {
                 date: date, amount: ammount, goal: goal
             }
         ).then(response => {
             if(response.data.successResponse)
             {
-                console.log("Added new expense");
                 this.setState({redirect: true});
                 this.props.add = false;
             }
-            else console.log("Can add expense");
         }).catch(error => {
-            console.log("Can add expense");
+            console.log(error);
         });
 
     }
@@ -54,7 +51,7 @@ class AddExpense extends Component
         const {redirect} = this.state;
         if(redirect)
         {
-            return  <Redirect to='/expenses'/>;
+            return  <Redirect to='/income'/>;
         }
 
         return (
@@ -72,7 +69,7 @@ class AddExpense extends Component
                                    value={this.state.ammount} required/>
                         </div>
                         <div className="form-group">
-                            Na co wydatek:
+                            Źródło dochodu:
                             <input className="form-control center-block" type="text" name="goal" onChange={this.handleChange}
                                    value={this.state.goal} required/>
                         </div>
@@ -88,4 +85,4 @@ class AddExpense extends Component
     }
 }
 
-export default AddExpense;
+export default AddIncome;

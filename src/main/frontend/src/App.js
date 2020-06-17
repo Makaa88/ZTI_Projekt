@@ -5,7 +5,7 @@ import LoginComponent from "./Components/LoginComponent";
 import RegisterComponent from "./Components/RegisterComponent";
 import ExpensesController from "./Components/ExpensesComponent";
 import LogoutComponent from './Components/LogoutComponent';
-
+import IncomeComponent from './Components/IncomeComponent';
 import Header from "./Layout/Header";
 
 class App extends Component{
@@ -20,6 +20,7 @@ class App extends Component{
                         <Route exact path='/login' component={LoginComponent}/>
                         <Route exact path='/register' component={RegisterComponent}/>
                         <Route exact path='/expenses' component={ExpensesController}/>
+                        <Route exact path='/income' component={IncomeComponent}/>
                         <Route exact path='/logout' component={LogoutComponent}/>
                     </Switch>
                 </BrowserRouter>
