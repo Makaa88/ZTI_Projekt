@@ -56,15 +56,15 @@ class ExpensesComponent extends Component
         let m = new Date();
         let current = new Date(this.state.month);
         m.setDate(1);
-        m.setMonth(current.getMonth()+1);
+        m.setMonth(current.getMonth());
         m.setFullYear(current.getFullYear());
-
+        let id = parseInt(sessionStorage.getItem("session"));
 
         this.setState({sorted: true});
         axios.post(
             "/expenses/getSorted",
             {
-                date: m, amount: 0, goal: ""
+                date: m, amount: 0, goal: "", personId: id
             }
         ).then(response => {
             this.setState({data: response.data});

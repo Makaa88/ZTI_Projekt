@@ -11,7 +11,9 @@ import project.expenses.models.Expenses;
 import project.expenses.models.Person;
 import project.expenses.models.ResponseStatus;
 import project.expenses.models.dto.ExpensesDto;
+import project.expenses.models.dto.PersonDto;
 import project.expenses.repositiories.ExpensesRepository;
+import project.expenses.repositiories.PersonRepository;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
@@ -26,12 +28,14 @@ public class ExpensesController {
 
     @Autowired
     private ExpensesRepository expensesRepository;
+    @Autowired
+    private PersonRepository personRepository;
 
     @PostMapping("/addExpense")
-    public ExpensesDto addExpense(@RequestBody ExpensesDto expensesDto , @SessionAttribute("person") Person person)
+    public ExpensesDto addExpense(@RequestBody ExpensesDto expensesDto)
     {
-        if(person == null) System.out.println("PERSON IS NULL");
-        else System.out.println(person.getId());
+
+        Person person = personRepository.findById(expensesDto.getPersonId()).get();
         Expenses expenses = new Expenses();
         expenses.setPerson(person);
         expenses.setDate(expensesDto.getDate());
@@ -58,10 +62,9 @@ public class ExpensesController {
         return expensesDto;
     }
 
-
-    @PutMapping("/edit/{id}")
-    public ExpensesDto editExpense(@RequestBody ExpensesDto expensesDto, @PathVariable long id, @SessionAttribute("person") Person person)
+    private ExpensesDto performEditExpense(ExpensesDto expensesDto, long id)
     {
+        Person person = personRepository.findById(expensesDto.getPersonId()).get();
         Optional<Expenses> optionalExpenses = expensesRepository.findById(id);
         ResponseStatus responseStatus = new ResponseStatus();
 
@@ -92,6 +95,20 @@ public class ExpensesController {
         return expensesDto;
     }
 
+
+    @PutMapping("/edit/{id}")
+    public ExpensesDto editExpense(@RequestBody ExpensesDto expensesDto, @PathVariable long id, @SessionAttribute("person") Person person)
+    {
+        return performEditExpense(expensesDto, id);
+    }
+
+
+    @GetMapping("/edit/{id}")
+    public ExpensesDto editExpenseGet(@RequestBody ExpensesDto expensesDto, @PathVariable long id, @SessionAttribute("person") Person person)
+    {
+        return performEditExpense(expensesDto, id);
+    }
+
     @DeleteMapping("/delete/{id}")
     public ResponseStatus deleteExpense(@PathVariable long id)
     {
@@ -116,8 +133,10 @@ public class ExpensesController {
     }
 
     @PostMapping("/getSorted")
-    public Iterable<ExpensesDto> getSortedExpenses(@RequestBody ExpensesDto expensesDto, @SessionAttribute("person") Person person)
+    public Iterable<ExpensesDto> getSortedExpenses(@RequestBody ExpensesDto expensesDto)
     {
+        System.out.println(expensesDto.getPersonId());
+        Person person = personRepository.findById(expensesDto.getPersonId()).get();
         List<Expenses> expensesList = expensesRepository.findAllByPersonId(person.getId());
         List<ExpensesDto> expensesDtoList = new ArrayList<>();
 

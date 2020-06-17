@@ -11,7 +11,15 @@ public class IncomeDto {
     private Double amount;
     private String goal;
     private ResponseStatus responseStatus;
+    private Long personId;
 
+    public Long getPersonId() {
+        return personId;
+    }
+
+    public void setPersonId(Long personId) {
+        this.personId = personId;
+    }
 
 
     public Long getId() {

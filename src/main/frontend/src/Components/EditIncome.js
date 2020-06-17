@@ -32,11 +32,12 @@ class EditIncome extends Component
         let id = this.props.id;
         const {date, ammount, goal} = this.state;
         console.log("GHandle submit");
+        let pid = parseInt(sessionStorage.getItem("session"));
 
         axios.put(
             "/income/edit/"+id,
             {
-                date: date, amount: ammount, goal: goal
+                date: date, amount: ammount, goal: goal, personId: pid
             }
         ).then(response => {
             if(response.data.successResponse)

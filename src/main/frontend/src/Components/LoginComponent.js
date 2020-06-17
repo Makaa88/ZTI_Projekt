@@ -41,7 +41,8 @@ class LoginComponent extends Component
             if(response.data.loginStatus)
             {
                 console.log("Loged");
-                sessionStorage.setItem("session", "valid");
+                sessionStorage.setItem("session", response.data.person.id);
+                console.log(sessionStorage.getItem("session"));
                 this.setState({redirect: true});
 
             }

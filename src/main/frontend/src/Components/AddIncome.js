@@ -29,11 +29,12 @@ class AddIncome extends Component
     handleSubmit(event)
     {
         const {date, ammount, goal} = this.state;
+        let id = parseInt(sessionStorage.getItem("session"));
 
         axios.post(
             "/income/addIncome",
             {
-                date: date, amount: ammount, goal: goal
+                date: date, amount: ammount, goal: goal, personId: id
             }
         ).then(response => {
             if(response.data.successResponse)

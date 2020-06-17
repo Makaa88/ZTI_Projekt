@@ -10,10 +10,17 @@ public class ExpensesDto {
     private LocalDate date;
     private Double amount;
     private String goal;
+    private Long personId;
     private ResponseStatus responseStatus;
 
 
+    public Long getPersonId() {
+        return personId;
+    }
 
+    public void setPersonId(Long personId) {
+        this.personId = personId;
+    }
     public Long getId() {
         return id;
     }

@@ -12,6 +12,7 @@ import project.expenses.models.dto.ExpensesDto;
 import project.expenses.models.dto.IncomeDto;
 import project.expenses.repositiories.ExpensesRepository;
 import project.expenses.repositiories.IncomeRepository;
+import project.expenses.repositiories.PersonRepository;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
@@ -27,9 +28,13 @@ public class IncomeController {
     @Autowired
     private IncomeRepository incomeRepository;
 
+    @Autowired
+    private PersonRepository personRepository;
+
     @PostMapping("/addIncome")
-    public IncomeDto addExpense(@RequestBody IncomeDto incomeDto , Model model, @SessionAttribute("person") Person person)
+    public IncomeDto addIncome(@RequestBody IncomeDto incomeDto , Model model)
     {
+        Person person = personRepository.findById(incomeDto.getPersonId()).get();
         Income income = new Income();
         income.setPerson(person);
         income.setDate(incomeDto.getDate());
@@ -56,10 +61,9 @@ public class IncomeController {
         return incomeDto;
     }
 
-
-    @PutMapping("/edit/{id}")
-    public IncomeDto editExpense(@RequestBody IncomeDto incomeDto, @PathVariable long id, @SessionAttribute("person") Person person)
+    private IncomeDto performEditIncome(IncomeDto incomeDto, long id)
     {
+        Person person = personRepository.findById(incomeDto.getPersonId()).get();
         Optional<Income> optionalIncome = incomeRepository.findById(id);
         ResponseStatus responseStatus = new ResponseStatus();
 
@@ -90,8 +94,20 @@ public class IncomeController {
         return incomeDto;
     }
 
+    @PutMapping("/edit/{id}")
+    public IncomeDto ediIncome(@RequestBody IncomeDto incomeDto, @PathVariable long id)
+    {
+        return  performEditIncome(incomeDto, id);
+    }
+
+    @GetMapping("/edit/{id}")
+    public IncomeDto ediIncomeGet(@RequestBody IncomeDto incomeDto, @PathVariable long id)
+    {
+        return  performEditIncome(incomeDto, id);
+    }
+
     @DeleteMapping("/delete/{id}")
-    public ResponseStatus deleteExpense(@PathVariable long id)
+    public ResponseStatus deleteIncome(@PathVariable long id)
     {
         incomeRepository.deleteById(id);
         ResponseStatus responseStatus = new ResponseStatus();
@@ -100,7 +116,7 @@ public class IncomeController {
     }
 
     @GetMapping("/getIncome")
-    public Iterable<IncomeDto> getExpenses()
+    public Iterable<IncomeDto> geIncomes()
     {
         List<Income> incomeList = incomeRepository.findAll();
         List<IncomeDto> incomeDtoList = new ArrayList<>();
@@ -120,8 +136,9 @@ public class IncomeController {
 
 
     @PostMapping("/getSorted")
-    public Iterable<IncomeDto> getSortedExpenses(@RequestBody IncomeDto incomeDto, @SessionAttribute("person") Person person)
+    public Iterable<IncomeDto> getSortedIncomes(@RequestBody IncomeDto incomeDto)
     {
+        Person person = personRepository.findById(incomeDto.getPersonId()).get();
         List<Income> incomeList = incomeRepository.findAllByPersonId(person.getId());
         List<IncomeDto> incomeDtoList = new ArrayList<>();
 
