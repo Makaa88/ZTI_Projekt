@@ -14,6 +14,7 @@ import project.expenses.models.dto.ExpensesDto;
 import project.expenses.models.dto.PersonDto;
 import project.expenses.repositiories.ExpensesRepository;
 import project.expenses.repositiories.PersonRepository;
+import project.expenses.service.ExpensesService;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
@@ -27,36 +28,15 @@ import java.util.Optional;
 public class ExpensesController {
 
     @Autowired
-    private ExpensesRepository expensesRepository;
-    @Autowired
-    private PersonRepository personRepository;
+    private ExpensesService expensesService;
 
     @PostMapping("/addExpense")
     public ExpensesDto addExpense(@RequestBody ExpensesDto expensesDto)
     {
 
-        Person person = personRepository.findById(expensesDto.getPersonId()).get();
-        Expenses expenses = new Expenses();
-        expenses.setPerson(person);
-        expenses.setDate(expensesDto.getDate());
-        expenses.setAmmount(expensesDto.getAmount());
-        expenses.setGoal(expensesDto.getGoal());
-
         ResponseStatus responseStatus = new ResponseStatus();
-        responseStatus.setSuccessResponse(true);
-        try
-        {
-            expensesRepository.save(expenses);
-        }
-        catch(DataIntegrityViolationException e)
-        {
-            responseStatus.setSuccessResponse(false);
-            responseStatus.setError("Error during saving expense");
-            expensesDto.setResponseStatus(responseStatus);
-            return expensesDto;
-        }
+        responseStatus.setSuccessResponse(expensesService.addExpense(expensesDto));
 
-        //expensesDto.setId(person.getId());
         expensesDto.setResponseStatus(responseStatus);
 
         return expensesDto;
@@ -64,47 +44,23 @@ public class ExpensesController {
 
     private ExpensesDto performEditExpense(ExpensesDto expensesDto, long id)
     {
-        Person person = personRepository.findById(expensesDto.getPersonId()).get();
-        Optional<Expenses> optionalExpenses = expensesRepository.findById(id);
+
         ResponseStatus responseStatus = new ResponseStatus();
-
-        responseStatus.setSuccessResponse(false);
-        responseStatus.setError("Cannot find given expense");
-
-        if(optionalExpenses.isPresent())
-        {
-            Expenses expenses = optionalExpenses.get();
-            expenses.setGoal(expensesDto.getGoal());
-            expenses.setAmmount(expensesDto.getAmount());
-            expenses.setDate(expensesDto.getDate());
-            expenses.setPerson(person);
-
-            try
-            {
-                expensesRepository.save(expenses);
-                responseStatus.setSuccessResponse(true);
-                responseStatus.setError("");
-            }
-            catch (DataIntegrityViolationException e)
-            {
-                responseStatus.setError("Cannot update expense");
-            }
-        }
-
+        responseStatus.setSuccessResponse(expensesService.editExpense(expensesDto, id));
         expensesDto.setResponseStatus(responseStatus);
         return expensesDto;
     }
 
 
     @PutMapping("/edit/{id}")
-    public ExpensesDto editExpense(@RequestBody ExpensesDto expensesDto, @PathVariable long id, @SessionAttribute("person") Person person)
+    public ExpensesDto editExpense(@RequestBody ExpensesDto expensesDto, @PathVariable long id)
     {
         return performEditExpense(expensesDto, id);
     }
 
 
     @GetMapping("/edit/{id}")
-    public ExpensesDto editExpenseGet(@RequestBody ExpensesDto expensesDto, @PathVariable long id, @SessionAttribute("person") Person person)
+    public ExpensesDto editExpenseGet(@RequestBody ExpensesDto expensesDto, @PathVariable long id)
     {
         return performEditExpense(expensesDto, id);
     }
@@ -112,16 +68,15 @@ public class ExpensesController {
     @DeleteMapping("/delete/{id}")
     public ResponseStatus deleteExpense(@PathVariable long id)
     {
-        expensesRepository.deleteById(id);
         ResponseStatus responseStatus = new ResponseStatus();
-        responseStatus.setSuccessResponse(true);
+        responseStatus.setSuccessResponse(expensesService.deleteExpense(id));
         return responseStatus;
     }
 
-    @GetMapping("/getExpenses")
-    public Iterable<ExpensesDto> getExpenses()
+    @GetMapping("/getExpenses/{id}")
+    public Iterable<ExpensesDto> getExpenses(@PathVariable long id)
     {
-         List<Expenses> expensesList = expensesRepository.findAll();
+        List<Expenses>expensesList = expensesService.getAll(id);
          List<ExpensesDto> expensesDtoList = new ArrayList<>();
 
          for(Expenses expenses : expensesList)
@@ -136,8 +91,7 @@ public class ExpensesController {
     public Iterable<ExpensesDto> getSortedExpenses(@RequestBody ExpensesDto expensesDto)
     {
         System.out.println(expensesDto.getPersonId());
-        Person person = personRepository.findById(expensesDto.getPersonId()).get();
-        List<Expenses> expensesList = expensesRepository.findAllByPersonId(person.getId());
+        List<Expenses> expensesList = expensesService.getUserSortedExpenses(expensesDto);
         List<ExpensesDto> expensesDtoList = new ArrayList<>();
 
 

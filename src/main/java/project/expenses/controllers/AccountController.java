@@ -8,6 +8,7 @@ import project.expenses.models.LogInDataModel;
 import project.expenses.models.Person;
 import project.expenses.models.dto.PersonDto;
 import project.expenses.repositiories.PersonRepository;
+import project.expenses.service.AuthService;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
@@ -19,19 +20,14 @@ import java.util.Optional;
 public class AccountController {
 
     @Autowired
-    private PersonRepository personRepository;
+    private AuthService authService;
 
     @PostMapping("/createAccount")
-    public void saveAccount(@RequestBody PersonDto person, Model model)
+    public Person saveAccount(@RequestBody PersonDto person, Model model)
     {
         System.out.println("Received create account request");
-        Person personToSave = new Person();
-        personToSave.setName(person.getName());
-        personToSave.setSurname(person.getSurname());
-        personToSave.setUsername(person.getUsername());
-        personToSave.setPassword(person.getPassword());
 
-        personRepository.save(personToSave);
+        return authService.createAccount(person);
     }
 
     @PostMapping("/login")
@@ -40,7 +36,7 @@ public class AccountController {
         System.out.println("Received login request");
         LogInDataModel logInDataModel =  new LogInDataModel(false, null);
 
-        Optional<Person> loginPerson = personRepository.findByUsernameAndPassword(person.getUsername(), person.getPassword());
+        Optional<Person> loginPerson = authService.loginUser(person);
         if(loginPerson.isPresent()) {
             System.out.println("Login successfull");
             session.setAttribute("person", loginPerson.get());

@@ -13,6 +13,7 @@ import project.expenses.models.dto.IncomeDto;
 import project.expenses.repositiories.ExpensesRepository;
 import project.expenses.repositiories.IncomeRepository;
 import project.expenses.repositiories.PersonRepository;
+import project.expenses.service.IncomeService;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
@@ -26,36 +27,14 @@ import java.util.Optional;
 public class IncomeController {
 
     @Autowired
-    private IncomeRepository incomeRepository;
-
-    @Autowired
-    private PersonRepository personRepository;
+    IncomeService incomeService;
 
     @PostMapping("/addIncome")
     public IncomeDto addIncome(@RequestBody IncomeDto incomeDto , Model model)
     {
-        Person person = personRepository.findById(incomeDto.getPersonId()).get();
-        Income income = new Income();
-        income.setPerson(person);
-        income.setDate(incomeDto.getDate());
-        income.setAmmount(incomeDto.getAmount());
-        income.setGoal(incomeDto.getGoal());
-
         ResponseStatus responseStatus = new ResponseStatus();
-        responseStatus.setSuccessResponse(true);
-        try
-        {
-            incomeRepository.save(income);
-        }
-        catch(DataIntegrityViolationException e)
-        {
-            responseStatus.setSuccessResponse(false);
-            responseStatus.setError("Error during saving expense");
-            incomeDto.setResponseStatus(responseStatus);
-            return incomeDto;
-        }
+        responseStatus.setSuccessResponse(incomeService.addIncome(incomeDto));
 
-        incomeDto.setId(person.getId());
         incomeDto.setResponseStatus(responseStatus);
 
         return incomeDto;
@@ -63,33 +42,8 @@ public class IncomeController {
 
     private IncomeDto performEditIncome(IncomeDto incomeDto, long id)
     {
-        Person person = personRepository.findById(incomeDto.getPersonId()).get();
-        Optional<Income> optionalIncome = incomeRepository.findById(id);
         ResponseStatus responseStatus = new ResponseStatus();
-
-        responseStatus.setSuccessResponse(false);
-        responseStatus.setError("Cannot find given expense");
-
-        if(optionalIncome.isPresent())
-        {
-            Income income = optionalIncome.get();
-            income.setGoal(incomeDto.getGoal());
-            income.setAmmount(incomeDto.getAmount());
-            income.setDate(incomeDto.getDate());
-            income.setPerson(person);
-
-            try
-            {
-                incomeRepository.save(income);
-                responseStatus.setSuccessResponse(true);
-                responseStatus.setError("");
-            }
-            catch (DataIntegrityViolationException e)
-            {
-                responseStatus.setError("Cannot update expense");
-            }
-        }
-
+        responseStatus.setSuccessResponse(incomeService.editIncome(incomeDto, id));
         incomeDto.setResponseStatus(responseStatus);
         return incomeDto;
     }
@@ -109,16 +63,15 @@ public class IncomeController {
     @DeleteMapping("/delete/{id}")
     public ResponseStatus deleteIncome(@PathVariable long id)
     {
-        incomeRepository.deleteById(id);
         ResponseStatus responseStatus = new ResponseStatus();
-        responseStatus.setSuccessResponse(true);
+        responseStatus.setSuccessResponse(incomeService.deleteIncome(id));
         return responseStatus;
     }
 
-    @GetMapping("/getIncome")
-    public Iterable<IncomeDto> geIncomes()
+    @GetMapping("/getIncome/{id}")
+    public Iterable<IncomeDto> geIncomes(@PathVariable long id)
     {
-        List<Income> incomeList = incomeRepository.findAll();
+        List<Income> incomeList = incomeService.getAll(id);
         List<IncomeDto> incomeDtoList = new ArrayList<>();
 
         for(Income income : incomeList)
@@ -138,8 +91,7 @@ public class IncomeController {
     @PostMapping("/getSorted")
     public Iterable<IncomeDto> getSortedIncomes(@RequestBody IncomeDto incomeDto)
     {
-        Person person = personRepository.findById(incomeDto.getPersonId()).get();
-        List<Income> incomeList = incomeRepository.findAllByPersonId(person.getId());
+        List<Income> incomeList = incomeService.getUserSortedIncomes(incomeDto);
         List<IncomeDto> incomeDtoList = new ArrayList<>();
 
 
