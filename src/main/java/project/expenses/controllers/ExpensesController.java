@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@CrossOrigin
+@CrossOrigin(origins = "*")
 @RequestMapping("/expenses")
 public class ExpensesController {
 
@@ -59,11 +59,6 @@ public class ExpensesController {
     }
 
 
-    @GetMapping("/edit/{id}")
-    public ExpensesDto editExpenseGet(@RequestBody ExpensesDto expensesDto, @PathVariable long id)
-    {
-        return performEditExpense(expensesDto, id);
-    }
 
     @DeleteMapping("/delete/{id}")
     public ResponseStatus deleteExpense(@PathVariable long id)

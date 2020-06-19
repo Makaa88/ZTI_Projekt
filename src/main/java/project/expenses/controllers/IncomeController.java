@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@CrossOrigin
+@CrossOrigin(origins = "*")
 @RequestMapping("/income")
 public class IncomeController {
 
@@ -32,6 +32,7 @@ public class IncomeController {
     @PostMapping("/addIncome")
     public IncomeDto addIncome(@RequestBody IncomeDto incomeDto , Model model)
     {
+        System.out.println("add income");
         ResponseStatus responseStatus = new ResponseStatus();
         responseStatus.setSuccessResponse(incomeService.addIncome(incomeDto));
 
@@ -54,11 +55,6 @@ public class IncomeController {
         return  performEditIncome(incomeDto, id);
     }
 
-    @GetMapping("/edit/{id}")
-    public IncomeDto ediIncomeGet(@RequestBody IncomeDto incomeDto, @PathVariable long id)
-    {
-        return  performEditIncome(incomeDto, id);
-    }
 
     @DeleteMapping("/delete/{id}")
     public ResponseStatus deleteIncome(@PathVariable long id)
