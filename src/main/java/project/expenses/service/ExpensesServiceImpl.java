@@ -1,6 +1,5 @@
 package project.expenses.service;
 
-import com.sun.xml.internal.messaging.saaj.packaging.mime.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
