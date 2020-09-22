@@ -1,6 +1,5 @@
 package project.expenses.service;
 
-import com.sun.xml.internal.messaging.saaj.packaging.mime.MessagingException;
 import project.expenses.models.Expenses;
 import project.expenses.models.dto.ExpensesDto;
 import java.util.List;
